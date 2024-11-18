@@ -29,7 +29,7 @@ Um aplicativo que extrai, traduz e analisa conteúdo de vídeos do YouTube usand
 1. Clone o repositório:
 
 ```bash
-git clone https://github.com/seu-usuario/youtube-content-analyzer.git
+git clone https://github.com/douglas-engenheirodedados/fluxo_opb
 cd youtube-content-analyzer
 ```
 
@@ -62,7 +62,9 @@ GROQ_API_KEY="sua_chave_da_api_da_groq"
 ```         
 
 
-## 📁 Estrutura do Projeto
+## 📁 Estrutura do Projet   o
+
+```plaintext
 youtube-content-analyzer/
 ├── .env
 ├── .gitignore
@@ -77,6 +79,7 @@ youtube-content-analyzer/
 ├── init.py
 ├── youtube_extractor.py
 └── translator_agent.py
+```
 
 
 ## 🚀 Como Executar
