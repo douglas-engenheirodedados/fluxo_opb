@@ -13,3 +13,9 @@ __pycache__/
 
 # Transcripts
 src/transcripts/
+
+# Translations
+src/translations/
+
+# Database
+cache.db

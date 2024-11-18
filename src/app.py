@@ -1,5 +1,6 @@
 import streamlit as st
 from agents.youtube_extractor import YoutubeExtractorAgent
+from agents.translator_agent import TranslatorAgent
 import os
 
 # Configuração da página
@@ -42,6 +43,10 @@ def main():
     st.title("🎥 YouTube Content Analyzer")
     st.markdown("---")
     
+    # Inicializa os agentes
+    extractor = YoutubeExtractorAgent()
+    translator = TranslatorAgent()
+    
     # Área de entrada da URL
     url = st.text_input(
         "Cole a URL do vídeo do YouTube aqui:",
@@ -49,45 +54,69 @@ def main():
     )
     
     # Botão de processar
-    if st.button("Extrair Legendas", type="primary"):
+    if st.button("Processar Vídeo", type="primary"):
         if url:
+            # Extração das legendas
             with st.spinner("Extraindo legendas do vídeo..."):
-                try:
-                    # Inicializa o agente
-                    extractor = YoutubeExtractorAgent()
+                transcript, filepath = extractor.get_transcript(url)
+                
+                if filepath:
+                    st.success("Legendas extraídas com sucesso!")
                     
-                    # Extrai e salva as legendas
-                    transcript, filepath = extractor.get_transcript(url)
-                    
-                    if filepath:
-                        # Exibe o sucesso
-                        st.success("Legendas extraídas com sucesso!")
+                    # Tradução
+                    with st.spinner("Traduzindo para português..."):
+                        translated_text, error = translator.translate_text(transcript)
                         
-                        # Container para a saída
-                        with st.expander("Ver Transcrição", expanded=True):
-                            st.markdown(f"""
-                            <div class="output-container">
-                                <p>{transcript}</p>
-                            </div>
-                            """, unsafe_allow_html=True)
-                            
-                        # Informações do arquivo
-                        st.info(f"📁 Arquivo salvo em: {filepath}")
-                        
-                        # Botão para download
-                        with open(filepath, 'r', encoding='utf-8') as file:
-                            st.download_button(
-                                label="⬇️ Download Transcrição",
-                                data=file,
-                                file_name=os.path.basename(filepath),
-                                mime="text/plain"
+                        if translated_text:
+                            # Salva a tradução
+                            translated_filepath = translator.save_translation(
+                                translated_text, 
+                                filepath
                             )
-                    else:
-                        st.error("Não foi possível extrair as legendas.")
-                        st.code(transcript)  # Mostra a mensagem de erro
-                        
-                except Exception as e:
-                    st.error(f"Erro ao processar o vídeo: {str(e)}")
+                            
+                            st.success("Tradução concluída!")
+                            
+                            # Exibe os resultados em colunas
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                st.subheader("Texto Original")
+                                with st.expander("Ver texto original", expanded=True):
+                                    st.markdown(f"""
+                                    <div class="output-container">
+                                        <p>{transcript}</p>
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                                    
+                                    with open(filepath, 'r', encoding='utf-8') as file:
+                                        st.download_button(
+                                            label="⬇️ Download Original",
+                                            data=file,
+                                            file_name=os.path.basename(filepath),
+                                            mime="text/plain"
+                                        )
+                            
+                            with col2:
+                                st.subheader("Texto Traduzido")
+                                with st.expander("Ver tradução", expanded=True):
+                                    st.markdown(f"""
+                                    <div class="output-container">
+                                        <p>{translated_text}</p>
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                                    
+                                    with open(translated_filepath, 'r', encoding='utf-8') as file:
+                                        st.download_button(
+                                            label="⬇️ Download Tradução",
+                                            data=file,
+                                            file_name=os.path.basename(translated_filepath),
+                                            mime="text/plain"
+                                        )
+                        else:
+                            st.error(f"Erro na tradução: {error}")
+                else:
+                    st.error("Não foi possível extrair as legendas.")
+                    st.code(transcript)
         else:
             st.warning("Por favor, insira uma URL do YouTube.")
     
