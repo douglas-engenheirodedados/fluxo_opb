@@ -16,3 +16,6 @@ src/transcripts/
 
 # Translations
 src/translations/
+
+# Database
+cache.db

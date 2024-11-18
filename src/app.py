@@ -76,7 +76,7 @@ def main():
                             
                             st.success("Tradução concluída!")
                             
-                            # Exibe os resultados
+                            # Exibe os resultados em colunas
                             col1, col2 = st.columns(2)
                             
                             with col1:
