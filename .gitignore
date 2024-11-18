@@ -13,6 +13,7 @@ __pycache__/
 
 # Transcripts
 src/transcripts/
+transcriptions/
 
 # Translations
 src/translations/
